@@ -14,26 +14,44 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
+  //const url = "https://ctf.sherlock.xyz/fJBgYRP8iYJ3bpQmBuXcKNO49EtEcHWn9Et2Bp0r_-0";
+ // prov = ethers.getDefaultProvider();
+
+  
+
+  //get accounts and verify balances
+  const accounts = await hre.ethers.getSigners();
+
+  for (const account of accounts) {
+    console.log(account.address);
+    console.log(await account.getBalance());
+  }
+
   //set addresses for current challenge
-  const setupAddress = "0x46C9489797c5647F850dD3A5bcB13C240bcd383A";
-  const challenge = "0xD2034a50C5Adc8A190D4f8c8EE18643Ab8A0ff05";
+  const setupAddress = "0x76BB80b4F1bA62eD2665f537f605C3593daCc458";
+  const challenge = "0x43c3E684cfCD27083f7156E7d883FC7e449e1c59";
 
   //attach setup
   const setupContract = await hre.ethers.getContractAt("SetupBackup", setupAddress);
   
   //verify unsolved
   console.log("Solved before ?: ", await setupContract.isSolved());
+  console.log("Starting balance:", await ethers.provider.getBalance("0x43c3E684cfCD27083f7156E7d883FC7e449e1c59"));
 
   // deploy exploit contract
   const Exploit = await hre.ethers.getContractFactory("Exploit1");
-  const exploit = await Exploit.deploy(challenge, { value: parseEther("0.001") });
+  const exploit = await Exploit.deploy(challenge, { value: parseEther("1") });
   await exploit.deployed();
+  console.log("Exploit deployed to:", exploit.address);
+  //solve logic
+  await exploit.solve({value: parseEther("1")});
+  
 
   //verify solved
   console.log("Solved after?: ", await setupContract.isSolved());
   
 
-  console.log("Exploit deployed to:", exploit.address);
+  
 }
 
 // We recommend this pattern to be able to use async/await everywhere
